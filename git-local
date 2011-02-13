@@ -33,7 +33,7 @@ unless(-d $local_bare_repo ) {
 
 # my @dirs = File::Find::Rule->directory->maxdepth( 1 )->in( $local_repo_parent );
 # use Data::Dumper; warn Dumper( \@dirs );
-unless( -d $wc_path . '/.git' ) {
+unless( -d File::Spec->join( $wc_path , '.git' ) ) {
     print STDERR ".git directory not found, initializing.\n";
     qx(git init);
     qx(touch .gitignore);
