@@ -43,7 +43,7 @@ unless( -d '.git' ) {
 
 unless( qx( git remote | grep local ) ) {
     print STDERR "Remote local not found, creating one\n";
-    $repo->command('remote', 'add', $local_bare_repo );
+    $repo->command('remote', 'add' , 'local', $local_bare_repo );
     $repo->command('push' ,'local','master');
 }
 
