@@ -20,32 +20,33 @@ $bare_repo->repo_path();
 my $branch = qx(git branch | grep "^\\*" );
 $branch =~ s/[\s*]//g;
 
-mkdir $local_repo_parent unless -d $local_repo_parent;
+    mkdir $local_repo_parent unless -d $local_repo_parent;
+    unless(-d $local_bare_repo ) {
+        print STDERR "Local bare repository not found, creating one.\n";
+        print STDERR "Creating directory: $local_bare_repo\n";
+        mkdir $local_bare_repo;
+    }
+    unless( -d File::Spec->join( $local_bare_repo , 'HEAD' ) ) {
+        print STDERR "Initializing bare repository.\n";
+        $bare_repo->command( 'init' , '--bare' );
+    }
 
-unless(-d $local_bare_repo ) {
-    print STDERR "Local bare repository not found, creating one.\n";
-    print STDERR "Creating directory: $local_bare_repo\n";
-    mkdir $local_bare_repo;
+    # my @dirs = File::Find::Rule->directory->maxdepth( 1 )->in( $local_repo_parent );
+    # use Data::Dumper; warn Dumper( \@dirs );
 
-    print STDERR "Initializing bare repository.\n";
-    $bare_repo->command( 'init' , '--bare' );
-}
+    unless( -d File::Spec->join( $wc_path , '.git' ) ) {
+        print STDERR ".git directory not found, initializing.\n";
+        qx(git init);
+        qx(touch .gitignore);
+        qx(git add .gitignore);
+        qx(git commit -a -m "First commit. add .gitignore file." );
+    }
 
-# my @dirs = File::Find::Rule->directory->maxdepth( 1 )->in( $local_repo_parent );
-# use Data::Dumper; warn Dumper( \@dirs );
-unless( -d File::Spec->join( $wc_path , '.git' ) ) {
-    print STDERR ".git directory not found, initializing.\n";
-    qx(git init);
-    qx(touch .gitignore);
-    qx(git add .gitignore);
-    qx(git commit -a -m "First commit. add .gitignore file." );
-}
-
-unless( qx( git remote | grep local ) ) {
-    print STDERR "Remote local not found, creating one\n";
-    $repo->command('remote', 'add' , 'local', $local_bare_repo );
-    $repo->command('push' ,'local','master');
-}
+    unless( qx( git remote | grep local ) ) {
+        print STDERR "Remote local not found, creating one\n";
+        $repo->command('remote', 'add' , 'local', $local_bare_repo );
+        $repo->command('push' ,'local','master');
+    }
 
 if( $subcmd =~ /pull/ ) {
     if( $repo->command('diff') ) {
@@ -56,8 +57,6 @@ if( $subcmd =~ /pull/ ) {
     $repo->command_noisy( 'pull' , '--rebase' , 'local' , $target_branch );
 }
 elsif( $subcmd =~ /init/ ) {
-
-
 }
 elsif( $subcmd =~ /push/ ) {
     my $target_branch = shift || $branch;
