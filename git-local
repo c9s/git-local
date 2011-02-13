@@ -48,7 +48,7 @@ $branch =~ s/[\s*]//g;
         $repo->command_noisy('push' ,'local','master');
     }
 
-if( $subcmd =~ /pull/ ) {
+if( $subcmd eq 'pull' ) {
     if( $repo->command('diff') ) {
         die( 'Dirty' );
     }
@@ -56,19 +56,24 @@ if( $subcmd =~ /pull/ ) {
     $repo->command_noisy( 'fetch' , 'local' );
     $repo->command_noisy( 'pull' , '--rebase' , 'local' , $target_branch );
 }
-elsif( $subcmd =~ /init/ ) {
+elsif( $subcmd eq 'init' ) {
 }
-elsif( $subcmd =~ /push/ ) {
+elsif( $subcmd eq 'push' ) {
     my $target_branch = shift || $branch;
     $repo->command_noisy( 'push' , 'local' , $target_branch );
 }
-elsif( $subcmd =~ /sync/ ) {
+elsif( $subcmd eq 'sync' ) {
     if( $repo->command('diff') ) {
         die( 'Dirty' );
     }
     $repo->command_noisy( 'fetch' , 'local' );
     $repo->command_noisy( 'pull' , '--rebase' , 'local' , $branch );
     $repo->command_noisy( 'push' , 'local' , '--all' );
+}
+elsif( $subcmd eq 'gc' ) {
+    print STDERR "GCing...\n";
+    $bare_repo->command_noisy('gc');
+    $repo->command_noisy('gc');
 }
 
 print STDERR "Done.\n";
