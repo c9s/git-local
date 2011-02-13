@@ -33,7 +33,7 @@ unless(-d $local_bare_repo ) {
 
 # my @dirs = File::Find::Rule->directory->maxdepth( 1 )->in( $local_repo_parent );
 # use Data::Dumper; warn Dumper( \@dirs );
-unless( -d '.git' ) {
+unless( -d $wc_path . '/.git' ) {
     print STDERR ".git directory not found, initializing.\n";
     qx(git init);
     qx(touch .gitignore);
@@ -46,7 +46,6 @@ unless( qx( git remote | grep local ) ) {
     $repo->command('remote', 'add' , 'local', $local_bare_repo );
     $repo->command('push' ,'local','master');
 }
-
 
 if( $subcmd =~ /pull/ ) {
     if( $repo->command('diff') ) {
