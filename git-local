@@ -26,7 +26,7 @@ $branch =~ s/[\s*]//g;
         print STDERR "Creating directory: $local_bare_repo\n";
         mkdir $local_bare_repo;
     }
-    unless( -d File::Spec->join( $local_bare_repo , 'HEAD' ) ) {
+    unless( -f File::Spec->join( $local_bare_repo , 'HEAD' ) ) {
         print STDERR "Initializing bare repository.\n";
         $bare_repo->command( 'init' , '--bare' );
     }
@@ -44,8 +44,8 @@ $branch =~ s/[\s*]//g;
 
     unless( qx( git remote | grep local ) ) {
         print STDERR "Remote local not found, creating one\n";
-        $repo->command('remote', 'add' , 'local', $local_bare_repo );
-        $repo->command('push' ,'local','master');
+        $repo->command_noisy('remote', 'add' , 'local', $local_bare_repo );
+        $repo->command_noisy('push' ,'local','master');
     }
 
 if( $subcmd =~ /pull/ ) {
