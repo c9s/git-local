@@ -55,6 +55,10 @@ if( $subcmd =~ /pull/ ) {
     $repo->command_noisy( 'fetch' , 'local' );
     $repo->command_noisy( 'pull' , '--rebase' , 'local' , $target_branch );
 }
+elsif( $subcmd =~ /init/ ) {
+
+
+}
 elsif( $subcmd =~ /push/ ) {
     my $target_branch = shift || $branch;
     $repo->command_noisy( 'push' , 'local' , $target_branch );
